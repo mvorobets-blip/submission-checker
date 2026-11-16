@@ -52,13 +52,16 @@ if (!repo) add("C1-fields", "критично", repoField?.line ?? 0, "«Ваш�
 if (!/^[0-9a-f]{40}$/.test(sha)) add("C1-fields", "критично", shaField?.line ?? 0, "«SHA» — не 40 шістнадцяткових символів (повний SHA коміту main)");
 if (!prodHost) add("C1-fields", "критично", prodField?.line ?? 0, "«Прод-URL» — немає або не адреса");
 
+// Рядок без `код`-фрагментів.
+const withoutCode = (l) => l.replace(/`[^`]*`/g, "");
 // Рядок без URL (щоб «#12» усередині адреси не рахувався короткою адресою).
 const withoutUrls = (l) => l.replace(/https?:\/\/\S+/g, "");
 
 lines.forEach((l, idx) => {
   const n = idx + 1;
   // C2 — заглушки, які забули замінити.
-  const ph = l.match(/\b(FINAL_SHA|SMOKE_RUN|CI_RUN|UAT_LINK|EVAL_READY_DATE|DEVIATIONS|TODO|TBD|XXX)\b|<[^>\s]{2,}>/);
+  // Кутові дужки — лише поза `код`-фрагментами: `add-<зріз4>` (підпис шаблону) чи `<document>` (опис коду) — не заглушка.
+  const ph = l.match(/\b(FINAL_SHA|SMOKE_RUN|CI_RUN|UAT_LINK|EVAL_READY_DATE|DEVIATIONS|TODO|TBD|XXX)\b/) ?? withoutCode(l).match(/<[^>\s]{2,}>/);
   if (ph && !l.trim().startsWith("<!--")) add("C2-placeholder", "критично", n, `заглушка «${ph[0]}»`);
 
   // C3 — посилання на файли власного репо закріплені на SHA здачі, а не на гілці.
@@ -80,7 +83,7 @@ lines.forEach((l, idx) => {
   }
 
   // C7 — лише синтетичні адреси пошти.
-  for (const m of l.matchAll(/[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g)) {
+  for (const m of l.matchAll(/[\w.+-]+@[\w-]+(?:\.[\w-]+)*\.[A-Za-z]{2,}\b/g)) {
     if (!m[0].endsWith("@example.test")) add("C7-synthetic", "критично", n, "адреса пошти не @example.test");
   }
 
@@ -90,21 +93,27 @@ lines.forEach((l, idx) => {
   }
 });
 
-// C5 — /api/health: повна адреса на хості з «Прод-URL».
-const healthLines = lines.map((l, i) => ({ l, n: i + 1 })).filter(({ l }) => l.includes("/api/health"));
-if (healthLines.length === 0) add("C5-health", "важливо", 0, "немає посилання на /api/health");
-for (const { l, n } of healthLines) {
-  const url = l.match(/https?:\/\/[^\s)]+\/api\/health/)?.[0];
-  if (!url) add("C5-health", "важливо", n, "/api/health без повної адреси");
-  else if (prodHost && new URL(url).host !== prodHost) add("C5-health", "важливо", n, `/api/health на хості ${new URL(url).host}, а «Прод-URL» — ${prodHost}`);
+// C5 — /api/health: хоча б одна повна адреса, і кожна — на хості з «Прод-URL». Згадка словом (у переліку перевірок,
+// у підписі поля) — не посилання, тож не знахідка.
+const healthUrls = lines.flatMap((l, i) => [...l.matchAll(/https?:\/\/[^\s)]+\/api\/health/g)].map((m) => ({ url: m[0], n: i + 1 })));
+if (healthUrls.length === 0) {
+  const n = lines.findIndex((l) => l.includes("/api/health")) + 1;
+  add("C5-health", "важливо", n, n ? "/api/health без повної адреси" : "немає посилання на /api/health");
+}
+for (const { url, n } of healthUrls) {
+  const host = new URL(url).host;
+  if (prodHost && host !== prodHost) add("C5-health", "важливо", n, `/api/health на хості ${host}, а «Прод-URL» — ${prodHost}`);
 }
 
 // C9 — кожен кейс з FAIL / NOT RUN / ❌ має рядок у «Пояснення FAIL і NOT RUN».
+// Пояснення — рядок «Пояснення FAIL…» і вкладені пункти під ним (до наступного пункту верхнього рівня чи заголовка).
 const explIdx = lines.findIndex((l) => l.includes("Пояснення FAIL"));
-const explanation = explIdx < 0 ? "" : lines[explIdx];
+let explEnd = explIdx;
+if (explIdx >= 0) while (explEnd + 1 < lines.length && /^\s+\S/.test(lines[explEnd + 1])) explEnd++;
+const explanation = explIdx < 0 ? "" : lines.slice(explIdx, explEnd + 1).join("\n");
 const failed = new Map();
 lines.forEach((l, idx) => {
-  if (idx === explIdx || !/FAIL|NOT RUN|❌/.test(l)) return;
+  if ((idx >= explIdx && idx <= explEnd && explIdx >= 0) || !/FAIL|NOT RUN|❌/.test(l)) return;
   for (const m of l.matchAll(/GC-\d{2}/g)) if (!failed.has(m[0])) failed.set(m[0], idx + 1);
 });
 for (const [id, n] of failed) {
