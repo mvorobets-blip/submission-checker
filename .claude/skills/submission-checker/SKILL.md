@@ -25,6 +25,11 @@ allowed-tools: Bash(node scripts/check-submission.mjs *) Read Grep Glob Edit(/ou
 
 ## Процедура A — перевірка скриптом
 
+**Команду запускай рівно так, як написано нижче, одну:** без `;`, `&&`, `|`, `echo $?`, `ls` і перенаправлень.
+Запуск без людини йде з `--permission-mode dontAsk`: дозволено лише `Bash(node scripts/check-submission.mjs *)`, а
+будь-яке «доповнення» робить команду іншою — її відхилять (так зламався запуск 2026-11-16T16-39-21). Код виходу видно
+в результаті інструмента; вміст `out/` — через Glob.
+
 ```
 node scripts/check-submission.mjs <тека набору>
 ```
