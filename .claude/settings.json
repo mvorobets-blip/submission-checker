@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Skill(submission-checker)",
+      "Agent(submission-verifier)",
+      "Bash(node scripts/check-submission.mjs *)",
+      "Edit(/out/**)"
+    ],
+    "deny": [
+      "Read(.env)",
+      "Read(.env.*)",
+      "Read(/tests/**)",
+      "Grep(/tests/**)",
+      "Glob(/tests/**)",
+      "Edit(/data/**)",
+      "Edit(/scripts/**)",
+      "Edit(/references/**)",
+      "Edit(/tests/**)",
+      "Edit(/.claude/**)",
+      "Edit(/.github/**)",
+      "Edit(/AGENTS.md)",
+      "Edit(/CLAUDE.md)",
+      "Edit(/run.sh)",
+      "WebFetch",
+      "WebSearch",
+      "Bash(curl *)",
+      "Bash(wget *)",
+      "Bash(gh *)",
+      "Bash(rm *)",
+      "Bash(git push *)",
+      "Bash(git commit *)",
+      "Bash(cat tests/*)",
+      "Bash(node tests/*)",
+      "Bash(node --test *)"
+    ]
+  }
+}

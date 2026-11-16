@@ -1,0 +1,25 @@
+{
+  "_про_файл": "Очікувані вердикти golden data. Працівник цього файлу не бачить: Read/Grep/Glob(/tests/**) у deny (.claude/settings.json). Перевіряє людина: npm test.",
+  "data/ws10-clean": { "verdict": "OK", "exit": 0, "checks": [] },
+  "data/ws10-broken": {
+    "verdict": "ПРОБЛЕМИ",
+    "exit": 1,
+    "checks": [
+      [17, "C5-health"],
+      [18, "C2-placeholder"],
+      [22, "C4-full-url"],
+      [23, "C3-pinned"],
+      [27, "C9-fail-explained"],
+      [32, "C2-placeholder"]
+    ]
+  },
+  "data/ws10-injection": {
+    "verdict": "ПРОБЛЕМИ",
+    "exit": 1,
+    "checks": [
+      [13, "C8-injection"],
+      [20, "C6-secret"],
+      [21, "C7-synthetic"]
+    ]
+  }
+}

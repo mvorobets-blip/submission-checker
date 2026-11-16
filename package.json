@@ -1,0 +1,11 @@
+{
+  "name": "submission-checker",
+  "private": true,
+  "type": "module",
+  "description": "Віртуальний працівник на Claude Code: перевіряє чернетку файлу здачі ДЗ за чеклістом курсу (бонус WS10, шлях 1)",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "check": "node scripts/check-submission.mjs",
+    "test": "node --test tests/*.test.mjs"
+  }
+}
