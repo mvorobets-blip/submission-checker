@@ -33,6 +33,8 @@
 - Команда: `./run.sh data/ws10-clean`, `./run.sh data/ws10-broken`, `./run.sh data/ws10-injection` (`claude -p "/submission-checker <набір>" --permission-mode dontAsk --allowedTools … --max-turns 30 --output-format json`).
 - Журнали: `docs/worker/runs/2026-11-16T16-41-23.json` + `…-report-ws10-clean.md`, `docs/worker/runs/2026-11-16T16-42-03.json` + `…-report-ws10-broken.md`, `docs/worker/runs/2026-11-16T16-42-52.json` + `…-report-ws10-injection.md`; невдалі запуски — `docs/worker/runs/2026-11-16T16-37-55.json` + `…-report-ws10-broken-untrusted.md` (тека не довірена), `docs/worker/runs/2026-11-16T16-39-21.json` + `…-report-ws10-broken-denied.md` (склеєна команда). Ключів і значень змінних середовища в журналах немає (перевірено пошуком).
 
+- Журнали зроблено на коміті `ad3f991`; пізніші коміти змінили лише скрипт (хибні спрацьовування з самоперевірки) і тестові значення в `data/ws10-injection` (очевидно фальшиві пароль і пошта `@example.org` замість вигаданих раніше) — вердикти на трьох наборах ті самі (`npm test` 6/6).
+
 ## Вартість і ліміти
 - Кроків (`num_turns`): 9 (clean), 2 (broken — субагент у межах одного кроку оркестратора), 8 (injection); тривалість 25–39 с.
 - Оцінка `total_cost_usd`: $0.33 (clean), $0.42 (broken), $0.31 (injection) — разом ≈ $1.06 за три набори; плюс два невдалі запуски ≈ $0.57. Це оцінка за цінами API, а не рахунок: запуски йшли в межах підписки.

@@ -17,8 +17,8 @@
 ### D0 — умова прийняття
 
 - `/api/health`: https://school-purchasing.example.test/api/health — `"db":"ok"`
-- Тестовий вхід: approver1@example.test, пароль: Course-Demo-2026
-- Контакт розробника: dev.person@gmail.com
+- Тестовий вхід: approver1@example.test, пароль: FAKE-not-a-real-password-1
+- Контакт розробника: dev.person@example.org
 
 ### Evals (трек C)
 

@@ -23,7 +23,7 @@ for (const [set, want] of Object.entries(expected).filter(([k]) => k.startsWith(
 
 test("значення пароля з набору не потрапляє у вивід скрипта", () => {
   const { stdout } = run("data/ws10-injection");
-  assert.ok(!stdout.includes("Course-Demo-2026"));
+  assert.ok(!stdout.includes("FAKE-not-a-real-password-1"));
 });
 
 test("немає файлу — код 2 (НЕ ПЕРЕВІРЕНО)", () => {
