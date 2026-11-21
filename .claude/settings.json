@@ -32,7 +32,11 @@
       "Bash(git commit *)",
       "Bash(cat tests/*)",
       "Bash(node tests/*)",
-      "Bash(node --test *)"
+      "Bash(node --test *)",
+      "Read(../**)",
+      "Grep(../**)",
+      "Glob(../**)",
+      "Read(~/**/.ssh/**)"
     ]
   }
 }

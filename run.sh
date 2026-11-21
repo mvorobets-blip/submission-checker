@@ -18,15 +18,21 @@ mkdir -p out/runs
 # --permission-mode dontAsk: усе, що не дозволено явно, — відмова (без людини нема кому натиснути «так»).
 # --allowedTools: те саме, що в .claude/settings.json, — на випадок, якщо його змінять.
 # --max-turns: стеля кроків; --output-format json: результат, кроки й total_cost_usd у файл.
+# Read / Grep / Glob — лише в data/, references/, out/ (відгук викладача WS10): навіть під ін'єкцією працівник не читає
+# файли поза своїми даними — ні решту репо, ні домашню теку.
 set +e
 "$CLAUDE_BIN" -p "/submission-checker ${SET}" \
   --permission-mode dontAsk \
-  --allowedTools "Skill(submission-checker),Agent(submission-verifier),Bash(node scripts/check-submission.mjs *),Read,Grep,Glob,Edit(/out/**)" \
+  --allowedTools "Skill(submission-checker),Agent(submission-verifier),Bash(node scripts/check-submission.mjs *),Read(./data/**),Read(./references/**),Read(./out/**),Grep(./data/**),Grep(./references/**),Glob(./data/**),Glob(./out/**),Edit(/out/**)" \
   --max-turns 30 \
   --output-format json \
   > "out/runs/${STAMP}.json"
 code=$?
 set -e
+
+# Журнал без абсолютного шляху домашньої теки (ім'я облікового запису машини) — перед комітом у docs/worker/runs/.
+tmp="$(mktemp)"
+sed "s#${HOME}#~#g" "out/runs/${STAMP}.json" > "$tmp" && mv "$tmp" "out/runs/${STAMP}.json"
 
 echo "Результат запуску: out/runs/${STAMP}.json (код виходу ${code}); звіт — новий файл у out/"
 exit "$code"
